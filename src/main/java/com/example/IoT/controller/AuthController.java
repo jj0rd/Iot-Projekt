@@ -6,10 +6,13 @@ import com.example.IoT.service.JwtService;
 import com.example.IoT.service.LogoutService;
 import lombok.*;
 
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpResponse;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,8 +39,8 @@ public class AuthController {
                 .roles("ROLE_USER")
                 .build();
         userRepository.save(u);
-        String token = jwtService.generateToken(u.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token));
+
+       return ResponseEntity.ok("User registered successfully " + u.getUsername());
     }
 
     @PostMapping("/login")
