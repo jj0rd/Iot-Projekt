@@ -4,12 +4,17 @@ import com.example.IoT.model.User;
 import com.example.IoT.repository.UserRepository;
 import com.example.IoT.service.JwtService;
 import com.example.IoT.service.LogoutService;
+import com.example.IoT.service.MyUserDetailsService;
 import lombok.*;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,6 +26,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final LogoutService logoutService;
+    private final MyUserDetailsService userDetailsService;
 
     @Data static class AuthRequest { private String username; private String password; }
     @Data @AllArgsConstructor static class AuthResponse { private String token; }
@@ -49,8 +55,14 @@ public class AuthController {
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
-        String token = jwtService.generateToken(req.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token));
+        String accessToken = jwtService.generateToken(req.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(req.getUsername());
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
+
+        return ResponseEntity.ok(tokens);
     }
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
@@ -61,5 +73,23 @@ public class AuthController {
         String token = authHeader.substring(7); // usuń "Bearer "
         logoutService.logout(token);
         return ResponseEntity.ok("User logged out successfully");
+    }
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+
+        if (refreshToken == null || !jwtService.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String username = jwtService.extractUsername(refreshToken);
+        var userDetails = userDetailsService.loadUserByUsername(username);
+        String newAccessToken = jwtService.generateToken(userDetails.getUsername());
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", newAccessToken);
+        tokens.put("refreshToken", refreshToken); // można odnowić też refresh token, ale niekoniecznie
+
+        return ResponseEntity.ok(tokens);
     }
 }
