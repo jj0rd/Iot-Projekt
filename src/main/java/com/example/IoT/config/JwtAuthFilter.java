@@ -37,12 +37,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = header.substring(7);
         }
 
-        if (token != null && logoutService.isTokenBlacklisted(token)) {
+        // Sprawdzenie, czy token access nie został wylogowany
+        if (token != null && logoutService.isAccessTokenBlacklisted(token)) {
             System.out.println("Token jest na czarnej liście – odrzucono żądanie");
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
+        // Walidacja tokena i ustawienie autoryzacji
         if (token != null && jwtService.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = jwtService.extractUsername(token);
             var userDetails = userDetailsService.loadUserByUsername(username);
@@ -53,4 +55,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         chain.doFilter(req, res);
     }
+
 }
