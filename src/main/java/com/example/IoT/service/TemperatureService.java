@@ -1,6 +1,8 @@
 package com.example.IoT.service;
 
+import com.example.IoT.model.Device;
 import com.example.IoT.model.Temperature;
+import com.example.IoT.repository.DeviceRepository;
 import com.example.IoT.repository.TemperatureRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,20 +13,23 @@ import java.util.List;
 public class TemperatureService {
 
     private final TemperatureRepository repository;
+    private final DeviceRepository deviceRepository;
 
-    public TemperatureService(TemperatureRepository repository) {
+    public TemperatureService(TemperatureRepository repository, DeviceRepository deviceRepository) {
         this.repository = repository;
+        this.deviceRepository = deviceRepository;
     }
 
-    public Temperature saveTemperature(Double value) {
+    public Temperature saveTemperature(Long deviceId, Double value) {
+        Device device = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+
         Temperature temp = Temperature.builder()
                 .value(value)
                 .timestamp(LocalDateTime.now())
+                .device(device)
                 .build();
-        return repository.save(temp);
-    }
 
-    public List<Temperature> getAllTemperatures() {
-        return repository.findAllByOrderByTimestampDesc();
+        return repository.save(temp);
     }
 }

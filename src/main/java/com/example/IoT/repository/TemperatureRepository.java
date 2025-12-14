@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TemperatureRepository extends JpaRepository<Temperature, Long> {
 
-    List<Temperature> findAllByOrderByTimestampDesc();
+    List<Temperature> findByDeviceIdOrderByTimestampDesc(Long deviceId);
 }
