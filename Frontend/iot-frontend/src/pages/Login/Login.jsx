@@ -67,6 +67,7 @@ function Login() {
         setLoginUsername('');
         setLoginPassword('');
         setLoginErrors({});
+        window.location.href = '/Dashboard';
       } else {
         const errorText = await response.text();
         message.error(errorText || 'Błąd logowania');
@@ -114,39 +115,7 @@ function Login() {
     }
   };
 
-  const handleLogout = async () => {
-  const accessToken = localStorage.getItem('accessToken');
-
-  if (!accessToken) {
-    message.warning('Nie jesteś zalogowany');
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_URL}/logout`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(await response.text());
-    }
-
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-
-    message.success('Wylogowano pomyślnie');
-
-    // ⬇️ przekierowanie
-    window.location.href = '/login';
-
-  } catch (err) {
-    console.error(err);
-    message.error('Błąd wylogowania');
-  }
-};
+  
 
 
   const loginTab = (
@@ -303,16 +272,6 @@ function Login() {
           items={tabItems}
           centered
         />
-
-        {localStorage.getItem('accessToken') && (
-          <div className="logout-section">
-            <Space>
-              <Button onClick={handleLogout} danger>
-                Wyloguj się
-              </Button>
-            </Space>
-          </div>
-        )}
       </Card>
     </div>
   );

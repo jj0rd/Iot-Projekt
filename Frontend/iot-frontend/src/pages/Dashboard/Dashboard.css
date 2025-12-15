@@ -1,0 +1,30 @@
+/* Cały layout */
+.dashboard-layout {
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+/* Górny pasek */
+.dashboard-header {
+  padding: 0;
+  background: #001529;
+}
+
+/* Zawartość pod menu */
+.dashboard-content {
+  padding: 24px;
+}
+
+/* Karty czujników */
+.sensor-card {
+  min-height: 260px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Wartość temperatury */
+.sensor-value {
+  font-size: 48px;
+  margin: 40px 0 10px;
+}

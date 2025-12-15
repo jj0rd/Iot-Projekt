@@ -1,38 +1,15 @@
-import { useState } from 'react';
-import Login from "../src/pages/Login/Login"
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Login from './pages/Login/Login';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => !!localStorage.getItem('accessToken')
-  );
-
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-  };
-
   return (
-    <div className="app">
-      {!isAuthenticated ? (
-        <Login onLoginSuccess={handleLoginSuccess} />
-      ) : (
-        <div className="dashboard-container">
-          <div className="dashboard-card">
-            <h1>Witaj w IoT Application! 🎉</h1>
-            <p>Zostałeś pomyślnie zalogowany.</p>
-            <button className="logout-button" onClick={handleLogout}>
-              Wyloguj się
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
