@@ -1,13 +1,34 @@
 /* Cały layout */
 .dashboard-layout {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #fafafa;
 }
 
 /* Górny pasek */
 .dashboard-header {
   padding: 0;
-  background: #001529;
+  background: #1976d2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-header .ant-menu-dark {
+  background: #1976d2;
+}
+
+.dashboard-header .ant-menu-dark .ant-menu-item {
+  color: rgba(255, 255, 255, 0.87);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-header .ant-menu-dark .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.dashboard-header .ant-menu-dark .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
 /* Zawartość pod menu */
@@ -19,12 +40,45 @@
 .sensor-card {
   min-height: 260px;
   text-align: center;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+  border: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.sensor-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16), 0 0 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.sensor-card .ant-card-head {
+  border-bottom: 1px solid #e0e0e0;
+  background: #ffffff;
+  padding: 16px 24px;
+}
+
+.sensor-card .ant-card-head-title {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #212121;
+}
+
+.sensor-card .ant-card-body {
+  padding: 24px;
+  background: #ffffff;
 }
 
 /* Wartość temperatury */
 .sensor-value {
   font-size: 48px;
   margin: 40px 0 10px;
+  color: #212121;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+}
+
+.sensor-card .ant-typography {
+  color: #757575;
+  letter-spacing: 0.25px;
 }

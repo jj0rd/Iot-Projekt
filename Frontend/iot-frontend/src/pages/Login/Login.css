@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f0f2f5;
   padding: 20px;
 }
 
@@ -12,8 +12,11 @@
 .auth-card {
   width: 100%;
   max-width: 450px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+}
+
+.auth-card .ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 }
 
 /* Nagłówek */
@@ -25,12 +28,14 @@
 .auth-title {
   margin: 0;
   font-size: 28px;
-  color: #1890ff;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: 600;
 }
 
 .auth-subtitle {
-  color: #8c8c8c;
+  color: rgba(0, 0, 0, 0.45);
   margin-top: 8px;
+  font-size: 14px;
 }
 
 /* Formularze */
