@@ -20,4 +20,8 @@ public class Temperature {
     private Double value; // temperatura w stopniach
 
     private LocalDateTime timestamp;
+
+    @ManyToOne
+    @JoinColumn(name = "device_id", nullable = false)
+    private Device device;
 }

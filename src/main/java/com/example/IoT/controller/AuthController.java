@@ -53,7 +53,7 @@ public class AuthController {
                 .build();
         userRepository.save(u);
         String token = jwtService.generateToken(u.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok("Register successfully");
     }
 
     @PostMapping("/login")
