@@ -4,6 +4,7 @@ import com.example.IoT.model.RefreshToken;
 import com.example.IoT.model.User;
 import com.example.IoT.repository.UserRepository;
 import com.example.IoT.service.JwtService;
+import com.example.IoT.service.LogService;
 import com.example.IoT.service.LogoutService;
 import com.example.IoT.service.MyUserDetailsService;
 import com.example.IoT.repository.RefreshTokenRepository;
@@ -33,6 +34,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final MyUserDetailsService userDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final LogService logService;
     @Autowired
     private LogoutService logoutService;
 
@@ -65,6 +67,8 @@ public class AuthController {
         }
         String accessToken = jwtService.generateToken(req.getUsername());
         String refreshToken = jwtService.generateRefreshToken(req.getUsername());
+
+        logService.log(req.getUsername(), "LOGIN", "User logged in");
 
         RefreshToken rt = new RefreshToken();
         rt.setToken(refreshToken);
@@ -125,6 +129,8 @@ public class AuthController {
         String username = tokenEntity.get().getUsername();
         var userDetails = userDetailsService.loadUserByUsername(username);
         String newAccessToken = jwtService.generateToken(userDetails.getUsername());
+
+        logService.log(username, "REFRESH_TOKEN", "Access token refreshed");
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", newAccessToken);
