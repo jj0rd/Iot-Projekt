@@ -71,4 +71,29 @@ public class DeviceController {
 
         return temps;
     }
+
+    @GetMapping("/{id}/temperature-history")
+    public List<TemperatureDto> getTemperatureHistory(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        // Pobranie wszystkich temperatur dla urządzenia, posortowanych rosnąco po czasie
+        List<TemperatureDto> history = temperatureRepository
+                .findByDeviceIdOrderByTimestampDesc(id) // starsze rekordy pierwsze
+                .stream()
+                .map(t -> new TemperatureDto(
+                        t.getValue(),
+                        t.getTimestamp()
+                ))
+                .toList();
+
+        logService.log(
+                authentication.getName(),
+                "READ_DEVICE_TEMPERATURE_HISTORY",
+                "DeviceId=" + id + ", records=" + history.size()
+        );
+
+        return history;
+    }
+
 }

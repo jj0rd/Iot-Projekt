@@ -5,6 +5,7 @@ import com.example.IoT.repository.LogRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LogService {
@@ -24,5 +25,8 @@ public class LogService {
                 .build();
 
         logRepository.save(log);
+    }
+    public List<LogEntry> getAllLogs() {
+        return logRepository.findAllByOrderByTimestampDesc();
     }
 }
