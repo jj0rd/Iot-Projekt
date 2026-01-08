@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Card, Row, Col, Typography, message } from 'antd';
-import AppLayout from '../../components/AppLayout'; // import wspólnego layoutu
+import {
+  Card,
+  Row,
+  Col,
+  Typography,
+  message,
+  Modal,
+  List,
+  Spin
+} from 'antd';
+import AppLayout from '../../components/AppLayout';
 import './Dashboard.css';
 
 const { Title, Text } = Typography;
@@ -11,9 +20,19 @@ const API_LOGOUT = 'http://localhost:8080/api/auth';
 export default function Dashboard() {
   const [devices, setDevices] = useState([]);
   const [temperatures, setTemperatures] = useState({});
+
+  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const accessToken = localStorage.getItem('accessToken');
 
-  useEffect(() => { fetchDevices(); }, []);
+  /* ===================== INIT ===================== */
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
 
   useEffect(() => {
     if (devices.length === 0) return;
@@ -24,6 +43,8 @@ export default function Dashboard() {
 
     return () => clearInterval(interval);
   }, [devices]);
+
+  /* ===================== AUTH ===================== */
 
   const handleLogout = async () => {
     if (!accessToken) {
@@ -51,14 +72,19 @@ export default function Dashboard() {
     }
   };
 
+  /* ===================== API ===================== */
+
   const fetchDevices = async () => {
     try {
       const res = await fetch(`${API_URL}/getAllDevices`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+
       const data = await res.json();
-      setDevices(data.slice(0, 4));
-      data.slice(0, 4).forEach(d => fetchTemperature(d.id));
+      const firstDevices = data.slice(0, 4);
+
+      setDevices(firstDevices);
+      firstDevices.forEach(d => fetchTemperature(d.id));
     } catch {
       message.error('Błąd pobierania urządzeń');
     }
@@ -69,21 +95,57 @@ export default function Dashboard() {
       const res = await fetch(`${API_URL}/${deviceId}/temperatures`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
+
       const data = await res.json();
       if (data.length > 0) {
-        setTemperatures(prev => ({ ...prev, [deviceId]: data[0] }));
+        setTemperatures(prev => ({
+          ...prev,
+          [deviceId]: data[0]
+        }));
       }
     } catch (e) {
       console.error(e);
     }
   };
 
+  const fetchTemperatureHistory = async (device) => {
+    setSelectedDevice(device);
+    setIsModalOpen(true);
+    setLoadingHistory(true);
+
+    try {
+      const res = await fetch(
+        `${API_URL}/${device.id}/temperature-history`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      const data = await res.json();
+
+      // ✅ OSTATNIE 15 POMIARÓW
+      setHistory(data.slice(0, 15));
+    } catch (e) {
+      console.error(e);
+      message.error('Błąd pobierania historii temperatur');
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  /* ===================== UI ===================== */
+
   return (
     <AppLayout onLogout={handleLogout}>
       <Row gutter={[24, 24]}>
         {devices.map((device, index) => (
           <Col xs={24} md={12} key={device.id}>
-            <Card title={`L${index + 1} – ${device.name}`} className="sensor-card">
+            <Card
+              title={`L${index + 1} – ${device.name}`}
+              className="sensor-card"
+              hoverable
+              onClick={() => fetchTemperatureHistory(device)}
+            >
               <Title level={1} className="sensor-value">
                 {temperatures[device.id]?.value?.toFixed(1) ?? '--'}°C
               </Title>
@@ -92,6 +154,32 @@ export default function Dashboard() {
           </Col>
         ))}
       </Row>
+
+      {/* ================= MODAL ================= */}
+      <Modal
+        title={`Historia temperatur – ${selectedDevice?.name ?? ''}`}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        width={600}
+      >
+        {loadingHistory ? (
+          <Spin />
+        ) : (
+          <List
+            bordered
+            dataSource={history}
+            renderItem={(item) => (
+              <List.Item>
+                <Text strong>{item.value.toFixed(1)}°C</Text>
+                <Text type="secondary">
+                  {new Date(item.timestamp).toLocaleString()}
+                </Text>
+              </List.Item>
+            )}
+          />
+        )}
+      </Modal>
     </AppLayout>
   );
 }
